@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Authenticatable;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
@@ -20,7 +21,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'firstName', 'lastName', 'email', 'tokenId'
+        'firstName', 'lastName', 'email',
     ];
 
     /**
@@ -34,12 +35,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public static function hashPassword($password)
     {
-
+        return Hash::make($password);
     }
 
     public function comparePassword($candidatePassword)
     {
-
+        return Hash::check($candidatePassword, $this->password);
     }
 
     /**
