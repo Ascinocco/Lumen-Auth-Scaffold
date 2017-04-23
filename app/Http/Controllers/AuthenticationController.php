@@ -126,7 +126,19 @@ class AuthenticationController extends Controller
     {
         $user = Auth::user();
         $token = $request->input('token');
-        return "wtf";
+
+        $clauses = [
+            'value' => $token,
+            'userId' => $user->id
+        ];
+
+        $assocTokenRecord = Token::where($clauses)->first();
+        $assocTokenRecord->delete();
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Goodbye! :)'
+        ]);
     }
 
     public function secureRoute()

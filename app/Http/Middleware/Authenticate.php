@@ -75,7 +75,7 @@ class Authenticate
         {
             return response()->json([
                 'success' => false,
-                'msg' => 'No valid token found'
+                'msg' => 'No valid token found in db'
             ]);
         }
 
