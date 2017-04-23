@@ -23,3 +23,16 @@ $app->group([ 'prefix' => 'auth' ], function () use ($app) {
     ]);
 
 });
+
+/**
+ * User Account Endpoints
+ */
+
+$app->group([ 'prefix' => 'account', 'middleware' => 'auth' ], function () use ($app) {
+
+    // get account info
+    $app->get('/', 'UserController@read');
+
+    // update
+    $app->post('update', 'UserController@update');
+});

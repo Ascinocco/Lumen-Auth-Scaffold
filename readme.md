@@ -8,3 +8,7 @@ and modified it to best suit my needs
 
 This repo serves as a boilerplate for other projects.
 If you happen to accross this please feel free to use it and share any thoughs, opinions and concerns.
+
+# Lumen user endpoints
+I'm going to setup some basic user endpoints to perform CRUD on users
+for convenience for when I'm cloning this

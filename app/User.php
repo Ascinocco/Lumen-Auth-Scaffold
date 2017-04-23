@@ -44,6 +44,24 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     }
 
     /**
+     * This function converts a user object to json
+     * and gets rid of stuff that the user should not be able to update
+     * and also excludes users password
+     * 
+     * @return void
+     */
+    public function toCleanJson()
+    {
+        $user = [
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
+            'email' => $this->email
+        ];
+
+        return $user;
+    }
+
+    /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed
