@@ -15,6 +15,11 @@ $app->get('/', function () use ($app) {
     return $app->version();
 });
 
+$app->post('/auth/logout', [
+    'uses' => 'AuthenticationController@logout',
+    'middleware' => 'auth'
+]);
+
 $app->post('/auth/login', 'AuthenticationController@login');
 
 $app->post('/auth/register', 'AuthenticationController@register');

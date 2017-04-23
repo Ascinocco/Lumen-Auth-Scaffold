@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
@@ -69,7 +70,8 @@ class AuthenticationController extends Controller
 
         return response()->json([
             'success' => true,
-            'msg' => 'Account Created!'
+            'msg' => 'Account Created!',
+            'token' => $newToken->value
         ]);
     }
 
@@ -108,8 +110,9 @@ class AuthenticationController extends Controller
             $newToken->userId = $user->id;
             $newToken->save();
             return response()->json([
-                'token' => $token,
-                'msg' => 'Logged In!'
+                'success' => true,
+                'msg' => 'Logged In!',
+                'token' => $token
             ]);
         }
 
@@ -119,9 +122,11 @@ class AuthenticationController extends Controller
         ]);
     }
 
-    public function logut()
+    public function logout(Request $request)
     {
-
+        $user = Auth::user();
+        $token = $request->input('token');
+        return "wtf";
     }
 
     public function secureRoute()
