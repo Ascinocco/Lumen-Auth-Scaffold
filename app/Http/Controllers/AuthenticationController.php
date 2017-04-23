@@ -8,8 +8,10 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\JWTAuth;
+use Illuminate\Support\Facades\DB;
 use App\Token;
 use App\User;
+use Carbon\Carbon;
 
 class AuthenticationController extends Controller
 {
@@ -138,6 +140,44 @@ class AuthenticationController extends Controller
         return response()->json([
             'success' => true,
             'msg' => 'Goodbye! :)'
+        ]);
+    }
+
+    public function resetPassword(Request $request, $resetToken)
+    {
+        $token = DB::table('password_reset_tokens')
+            ->where('value', $resetToken)
+            ->first();
+
+        $exireyTime = Carbon::parse($token->expiresAt);
+        $currentTime = Carbon::now();
+
+        $currentTime = $currentTime->addMinutes(10);
+        // $expireyTime = $expireyTime->addMinutes(10);
+
+        if ($currentTime->gt($expireyTime))
+        {
+            return response()->json([
+                'success' => false,
+                'msg' => 'Reset token has expired'
+            ]);
+        }
+
+        $rules = [
+            'password' => 'required|confirmed|min:8',
+            'password_confirmation' => 'required|min:8'
+        ];
+
+        $this->validate($request, $rules);
+        $password = $request->input('password');
+
+        $user = User::where('email', $token->email)->first();
+        $user->password = User::hashPassword($password);
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Password has been reset. Log with your new password'
         ]);
     }
 }

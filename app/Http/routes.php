@@ -7,6 +7,7 @@
  *  login
  *  register
  *  logout
+ *  reset password
  */
 $app->group([ 'prefix' => 'auth' ], function () use ($app) {
 
@@ -22,6 +23,8 @@ $app->group([ 'prefix' => 'auth' ], function () use ($app) {
         'middleware' => 'auth'
     ]);
 
+    // reset password for locked out user
+    $app->post('resetPassword/{token}', 'AuthenticationController@resetPassword');
 });
 
 /**
