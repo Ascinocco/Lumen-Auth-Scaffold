@@ -33,6 +33,9 @@ $app->group([ 'prefix' => 'account', 'middleware' => 'auth' ], function () use (
     // get account info
     $app->get('/', 'UserController@read');
 
-    // update
+    // update account
     $app->post('update', 'UserController@update');
+
+    // delete account
+    $app->delete('delete', 'UserController@delete');
 });

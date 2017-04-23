@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
+use App\Token;
 
 class UserController extends Controller
 {
@@ -63,6 +64,20 @@ class UserController extends Controller
 
     public function delete()
     {
+        $user = Auth::user();
+        
+        $tokens = Token::where('userId', $user->id)->get();
 
+        foreach($tokens as $token)
+        {
+            $token->delete();
+        }
+        
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Sad to see you go :('
+        ]);
     }
 }
