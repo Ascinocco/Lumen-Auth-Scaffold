@@ -17,6 +17,8 @@ $app->get('/', function () use ($app) {
 
 $app->post('/auth/login', 'AuthenticationController@login');
 
+$app->post('/auth/register', 'AuthenticationController@register');
+
 $app->post('/auth/secure', [
     'uses' =>  'AuthenticationController@secureRoute',
     'middleware' => 'auth'

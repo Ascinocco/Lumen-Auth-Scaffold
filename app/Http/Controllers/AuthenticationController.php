@@ -22,9 +22,55 @@ class AuthenticationController extends Controller
         $this->jwt = $jwt;
     }
 
-    public function register()
+    public function register(Request $request)
     {
+        $rules = [
+            'email' => 'required|email|unique:users,email|max:255',
+            'firstName' => 'required|alpha|max:80',
+            'lastName' => 'required|alpha|max:125',
+            'password' => 'required|confirmed',
+            'password_confirmation' => 'required'
+        ];
 
+        $this->validate($request, $rules);
+
+        $fields = $request->all();
+
+        $user = new User;
+        
+        $user->firstName = $fields['firstName'];
+        $user->lastName = $fields['lastName'];
+        $user->email = $fields['email'];
+        $user->password = User::hashPassword($fields['password']);
+
+        $user->save();
+
+        try {
+            if (! $token = $this->jwt->attempt($request->only('email', 'password'))) {
+                return response()->json(['user_not_found'], 404);
+            }
+        } catch (TokenExpiredException $e) {
+
+            // remove expired token from db
+            $expiredToken = Token::where('value', $token)->first();
+            $expiredToken->delete();
+
+            return response()->json(['token_expired'], $e->getStatusCode());
+        } catch (TokenInvalidException $e) {
+            return response()->json(['token_invalid'], $e->getStatusCode());
+        } catch (JWTException $e) {
+            return response()->json(['token_absent' => $e->getMessage()], $e->getStatusCode());
+        }
+
+        $newToken = new Token;
+        $newToken->value = $token;
+        $newToken->userId = $user->id;
+        $newToken->save();
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Account Created!'
+        ]);
     }
 
     public function login(Request $request)
@@ -61,7 +107,10 @@ class AuthenticationController extends Controller
             $newToken->value = $token;
             $newToken->userId = $user->id;
             $newToken->save();
-            return response()->json(compact('token'));
+            return response()->json([
+                'token' => $token,
+                'msg' => 'Logged In!'
+            ]);
         }
 
         return response()->json([
