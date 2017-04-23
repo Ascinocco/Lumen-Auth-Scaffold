@@ -41,4 +41,9 @@ class AuthenticationController extends Controller
 
         return response()->json(compact('token'));
     }
+
+    public function secureRoute()
+    {
+        return "Worked";
+    }
 }
