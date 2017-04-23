@@ -29,8 +29,8 @@ class AuthenticationController extends Controller
             'email' => 'required|email|unique:users,email|max:255',
             'firstName' => 'required|alpha|max:80',
             'lastName' => 'required|alpha|max:125',
-            'password' => 'required|confirmed',
-            'password_confirmation' => 'required'
+            'password' => 'required|confirmed|min:8',
+            'password_confirmation' => 'required|min:8'
         ];
 
         $this->validate($request, $rules);

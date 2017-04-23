@@ -38,4 +38,7 @@ $app->group([ 'prefix' => 'account', 'middleware' => 'auth' ], function () use (
 
     // delete account
     $app->delete('delete', 'UserController@delete');
+
+    // change password
+    $app->post('changePassword', 'UserController@changePassword');
 });

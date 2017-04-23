@@ -80,4 +80,35 @@ class UserController extends Controller
             'msg' => 'Sad to see you go :('
         ]);
     }
+
+    public function changePassword(Request $request)
+    {
+        $rules = [
+            'old_password' => 'required',
+            'password' => 'required|confirmed|min:8',
+            'password_confirmation' => 'required|min:8'
+        ];
+
+        $this->validate($request, $rules);
+        $fields = $request->all();
+
+        $user = Auth::user();
+
+        if (! $user->comparePassword($fields['old_password']))
+        {
+            return response()->json([
+                'success' => false,
+                'msg' => 'Incorrect Current Password'
+            ]);
+        }
+
+        $user->password = User::hashPassword($fields['password']);
+
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Password Updated!'
+        ]);
+    }
 }
