@@ -1,30 +1,25 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
-*/
+/**
+ * Authentication Routes
+ * 
+ * Inlcudes:
+ *  login
+ *  register
+ *  logout
+ */
+$app->group([ 'prefix' => 'auth' ], function () use ($app) {
 
-$app->get('/', function () use ($app) {
-    return $app->version();
+    // login
+    $app->post('login', 'AuthenticationController@login');
+
+    // register
+    $app->post('register', 'AuthenticationController@register');
+
+    // logout
+    $app->post('logout', [
+        'uses' => 'AuthenticationController@logout',
+        'middleware' => 'auth'
+    ]);
+
 });
-
-$app->post('/auth/logout', [
-    'uses' => 'AuthenticationController@logout',
-    'middleware' => 'auth'
-]);
-
-$app->post('/auth/login', 'AuthenticationController@login');
-
-$app->post('/auth/register', 'AuthenticationController@register');
-
-$app->post('/auth/secure', [
-    'uses' =>  'AuthenticationController@secureRoute',
-    'middleware' => 'auth'
-]);

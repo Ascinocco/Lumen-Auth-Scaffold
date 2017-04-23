@@ -140,9 +140,4 @@ class AuthenticationController extends Controller
             'msg' => 'Goodbye! :)'
         ]);
     }
-
-    public function secureRoute()
-    {
-        return "Worked";
-    }
 }
