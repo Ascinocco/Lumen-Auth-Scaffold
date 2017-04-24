@@ -180,4 +180,52 @@ class AuthenticationController extends Controller
             'msg' => 'Password has been reset. Log with your new password'
         ]);
     }
+
+    public function requestPasswordReset(Request $request)
+    {
+        $email = $request->input('email');
+        $user = User::where('email', $email)->first();
+
+        if (!$user)
+        {
+            return response()->json([
+                'success' => false,
+                'msg' => 'Could not find your account'
+            ]);
+        }
+        
+        // send email with unqiue token
+        $token = uniqid('pw_reset_', true);
+
+        // prep email fields
+        $link = url('/resetPassword');
+        $link = $link . "/" . $token;
+        $to = $email;
+        $subject = "Request for Password Reset";
+        $message = "We have recieved your request to reset your password. Click the link" .
+        " provided to reset it. The link will expire in 10 minutes. " . 
+        "Link: " . $link;
+
+        $headers = "From: support@example.com";
+
+        $expiresAt = Carbon::now();
+        $expiresAt = $expiresAt->addMinutes(10);
+
+        $tokenFields = [
+                'value' => $token,
+                'email' => $email,
+                'expiresAt' => $expiresAt
+            ];
+
+        DB::table('password_reset_tokens')->insert($tokenFields);
+
+        $returnVal = mail($to, $subject, $message, $headers);
+
+        dd($returnVal);
+
+        return response()->json([
+            'success' => true,
+            'msg' => 'Check your email'
+        ]);
+    }
 }
