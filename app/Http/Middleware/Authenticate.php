@@ -74,6 +74,14 @@ class Authenticate
 
         $foundToken = Token::where('value', $token)->first();
 
+        if (!$foundToken)
+        {
+            return response()->json([
+                'success' => false,
+                'msg' => 'No valid token found in db'
+            ]);
+        }
+
         $createdAt = Carbon::parse($foundToken->created_at);
         $expireyTime = $createdAt->addDays(31);
         $currentTime = Carbon::now();
@@ -85,14 +93,6 @@ class Authenticate
             return response()->json([
                 'success' => false,
                 'msg' => 'Your token has expired, please login again.'
-            ]);
-        }
-
-        if (!$foundToken)
-        {
-            return response()->json([
-                'success' => false,
-                'msg' => 'No valid token found in db'
             ]);
         }
 
