@@ -144,8 +144,23 @@ class AuthenticationController extends Controller
         ]);
     }
 
-    public function resetPassword(Request $request, $resetToken)
+    /**
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function resetPassword(Request $request)
     {
+        $resetToken = $request->input('resetToken');
+
+        if (! $resetToken) 
+        {
+            return response()->json([
+                'success' => false,
+                'msg' => 'Missing Reset Token'
+            ]);
+        }
+
         $token = DB::table('password_reset_tokens')
             ->where('value', $resetToken)
             ->first();
@@ -176,7 +191,7 @@ class AuthenticationController extends Controller
         DB::table('password_reset_tokens')->whereColumn([
             [ 'value', '=', $resetToken ],
             [ 'email', '=', $user->email ]
-        ]);
+        ])->delete();
 
         return response()->json([
             'success' => true,

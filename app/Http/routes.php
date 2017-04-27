@@ -24,7 +24,10 @@ $app->group([ 'prefix' => 'auth' ], function () use ($app) {
     ]);
 
     // reset password for locked out user
-    $app->get('resetPassword/{token}', 'AuthenticationController@resetPassword');
+    // you will need a view to upload the pw reset info
+    // the controller function to load the view has not been stubbed out as I want to use
+    // this scaffold with SPA's'
+    $app->post('resetPassword/{token}', 'AuthenticationController@resetPassword');
     $app->post('requestPasswordReset', 'AuthenticationController@requestPasswordReset');
 });
 
