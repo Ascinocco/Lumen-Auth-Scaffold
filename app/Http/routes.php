@@ -24,7 +24,7 @@ $app->group([ 'prefix' => 'auth' ], function () use ($app) {
     ]);
 
     // reset password for locked out user
-    $app->post('resetPassword/{token}', 'AuthenticationController@resetPassword');
+    $app->get('resetPassword/{token}', 'AuthenticationController@resetPassword');
     $app->post('requestPasswordReset', 'AuthenticationController@requestPasswordReset');
 });
 

@@ -150,11 +150,8 @@ class AuthenticationController extends Controller
             ->where('value', $resetToken)
             ->first();
 
-        $exireyTime = Carbon::parse($token->expiresAt);
+        $expireyTime = Carbon::parse($token->expiresAt);
         $currentTime = Carbon::now();
-
-        $currentTime = $currentTime->addMinutes(10);
-        // $expireyTime = $expireyTime->addMinutes(10);
 
         if ($currentTime->gt($expireyTime))
         {
@@ -176,6 +173,11 @@ class AuthenticationController extends Controller
         $user->password = User::hashPassword($password);
         $user->save();
 
+        DB::table('password_reset_tokens')->whereColumn([
+            [ 'value', '=', $resetToken ],
+            [ 'email', '=', $user->email ]
+        ]);
+
         return response()->json([
             'success' => true,
             'msg' => 'Password has been reset. Log with your new password'
@@ -187,60 +189,46 @@ class AuthenticationController extends Controller
         $email = $request->input('email');
         $user = User::where('email', $email)->first();
 
-        Mail::send('emails.resetPassword', ['user' => $user],
-            function ($message) use ($user) {
-                $message->from('postmaster@sandboxb6dd6ed7a4b24c0186210ea1722d240a.mailgun.org', 'My Boilerplate');
-                $message->to('anthonyscinocco@gmail.com', $user->firstName)->subject('Request for Password Reset');
+        if (!$user)
+        {
+            return response()->json([
+                'success' => false,
+                'msg' => 'Could not find your account'
+            ]);
+        }
+
+        // send email with unqiue token
+        $token = uniqid('pw_reset_', true);
+
+        // prep email fields
+        $link = url('/auth/resetPassword');
+        $link = $link . "/" . $token;
+
+        $data = [
+            'user' => $user,
+            'link' => $link,
+            'token' => $token
+        ];
+
+        Mail::send('emails.resetPassword', $data, function ($message) use ($user) {
+            $message->from('postmaster@sandboxb6dd6ed7a4b24c0186210ea1722d240a.mailgun.org', 'Support@example.com');
+            $message->to($user->email, $user->firstName)->subject('Request for Password Reset');
         });
 
+        $expiresAt = Carbon::now();
+        $expiresAt = $expiresAt->addMinutes(10);
+
+        $tokenFields = [
+            'value' => $token,
+            'email' => $user->email,
+            'expiresAt' => $expiresAt
+        ];
+
+        DB::table('password_reset_tokens')->insert($tokenFields);
+
         return response()->json([
-            'success' => 'unknown',
-            'msg' => 'No errors but no email either'
+            'success' => true,
+            'msg' => 'Check your email'
         ]);
-
-        // $email = $request->input('email');
-        // $user = User::where('email', $email)->first();
-
-        // if (!$user)
-        // {
-        //     return response()->json([
-        //         'success' => false,
-        //         'msg' => 'Could not find your account'
-        //     ]);
-        // }
-        
-        // // send email with unqiue token
-        // $token = uniqid('pw_reset_', true);
-
-        // // prep email fields
-        // $link = url('/resetPassword');
-        // $link = $link . "/" . $token;
-        // $to = $email;
-        // $subject = "Request for Password Reset";
-        // $message = "We have recieved your request to reset your password. Click the link" .
-        // " provided to reset it. The link will expire in 10 minutes. " . 
-        // "Link: " . $link;
-
-        // $headers = "From: support@example.com";
-
-        // $expiresAt = Carbon::now();
-        // $expiresAt = $expiresAt->addMinutes(10);
-
-        // $tokenFields = [
-        //         'value' => $token,
-        //         'email' => $email,
-        //         'expiresAt' => $expiresAt
-        //     ];
-
-        // DB::table('password_reset_tokens')->insert($tokenFields);
-
-        // $returnVal = mail($to, $subject, $message, $headers);
-
-        // dd($returnVal);
-
-        // return response()->json([
-        //     'success' => true,
-        //     'msg' => 'Check your email'
-        // ]);
     }
 }
