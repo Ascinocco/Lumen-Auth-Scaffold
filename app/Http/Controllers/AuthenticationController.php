@@ -189,7 +189,7 @@ class AuthenticationController extends Controller
 
         Mail::send('emails.resetPassword', ['user' => $user],
             function ($message) use ($user) {
-                $message->from('support@example.com', 'My Boilerplate');
+                $message->from('postmaster@sandboxb6dd6ed7a4b24c0186210ea1722d240a.mailgun.org', 'My Boilerplate');
                 $message->to('anthonyscinocco@gmail.com', $user->firstName)->subject('Request for Password Reset');
         });
 
