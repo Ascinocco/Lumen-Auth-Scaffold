@@ -9,6 +9,8 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\JWTAuth;
 use App\Token;
+use Carbon\Carbon;
+
 
 class Authenticate
 {
@@ -71,6 +73,20 @@ class Authenticate
         }
 
         $foundToken = Token::where('value', $token)->first();
+
+        $createdAt = Carbon::parse($foundToken->created_at);
+        $expireyTime = $createdAt->addDays(31);
+        $currentTime = Carbon::now();
+
+        if ($currentTime->gt($expireyTime))
+        {
+            $foundToken->delete();
+
+            return response()->json([
+                'success' => false,
+                'msg' => 'Your token has expired, please login again.'
+            ]);
+        }
 
         if (!$foundToken)
         {
